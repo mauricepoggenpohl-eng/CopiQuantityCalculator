@@ -1,0 +1,79 @@
+{% block copi_qc_product_detail %}
+<div class="copi-qc-product-detail">
+    {% block copi_qc_product_detail_card %}
+    <mt-card
+        position-identifier="copi-qc-product-detail"
+        :title="$t('copi-quantity-calculator.detail.cardTitle')"
+        :is-loading="isLoading"
+    >
+        {% block copi_qc_product_detail_intro %}
+        <p class="copi-qc-product-detail__intro">
+            {{ $t('copi-quantity-calculator.detail.intro') }}
+        </p>
+        {% endblock %}
+
+        {% block copi_qc_product_detail_enabled %}
+        <mt-switch
+            v-model="enabled"
+            :disabled="!isEditable"
+            :label="$t('copi-quantity-calculator.detail.enabledLabel')"
+            :help-text="$t('copi-quantity-calculator.detail.enabledHelp')"
+        />
+        {% endblock %}
+
+        {% block copi_qc_product_detail_mode %}
+        <mt-select
+            v-model="mode"
+            :disabled="!isEditable"
+            :options="modeOptions"
+            :label="$t('copi-quantity-calculator.detail.modeLabel')"
+            :help-text="$t('copi-quantity-calculator.detail.modeHelp')"
+        />
+        {% endblock %}
+
+        {% block copi_qc_product_detail_factor %}
+        <mt-number-field
+            v-model="factor"
+            number-type="float"
+            :min="0"
+            :disabled="!isEditable"
+            :label="$t('copi-quantity-calculator.detail.factorLabel')"
+            :help-text="$t('copi-quantity-calculator.detail.factorHelp')"
+        />
+        {% endblock %}
+
+        {% block copi_qc_product_detail_factor_warning %}
+        <p
+            v-if="showFactorWarning"
+            class="copi-qc-product-detail__warning"
+        >
+            <mt-icon
+                name="regular-exclamation-triangle"
+                size="16"
+            />
+            <span>{{ $t('copi-quantity-calculator.detail.factorWarning') }}</span>
+        </p>
+        {% endblock %}
+
+        {% block copi_qc_product_detail_input_unit %}
+        <mt-text-field
+            v-model="inputUnit"
+            :disabled="!isEditable"
+            :label="$t('copi-quantity-calculator.detail.inputUnitLabel')"
+            :placeholder="$t('copi-quantity-calculator.detail.inputUnitPlaceholder')"
+            :help-text="$t('copi-quantity-calculator.detail.inputUnitHelp')"
+        />
+        {% endblock %}
+
+        {% block copi_qc_product_detail_help_text %}
+        <mt-textarea
+            v-model="helpText"
+            :disabled="!isEditable"
+            :label="$t('copi-quantity-calculator.detail.helpTextLabel')"
+            :help-text="$t('copi-quantity-calculator.detail.helpTextHelp')"
+        />
+        {% endblock %}
+    </mt-card>
+    {% endblock %}
+</div>
+{% endblock %}

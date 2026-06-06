@@ -1,0 +1,18 @@
+.copi-qc-product-detail {
+    &__intro {
+        margin-bottom: 24px;
+        color: var(--color-text-secondary, #52667a);
+    }
+
+    &__warning {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin: 4px 0 16px;
+        color: var(--color-text-critical-default, #c91c00);
+
+        .mt-icon {
+            flex: 0 0 auto;
+        }
+    }
+}

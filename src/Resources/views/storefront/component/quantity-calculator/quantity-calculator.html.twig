@@ -1,0 +1,146 @@
+{% block quantity_calculator %}
+    {% set qcCustomFields = qcCustomFields ?? (product.translated.customFields ?? {}) %}
+
+    {% set qcMode = qcCustomFields['quantity_calculator_mode']|default('area') %}
+    {% set qcFactor = qcCustomFields['quantity_calculator_factor']|default(0) %}
+    {% set qcInputUnit = qcCustomFields['quantity_calculator_input_unit']|default('') %}
+    {% if qcInputUnit is empty %}
+        {% set qcInputUnit = config('QuantityCalculator.config.defaultInputUnit')|default('') %}
+    {% endif %}
+    {% set qcHelpText = qcCustomFields['quantity_calculator_help_text']|default('') %}
+
+    {% set qcMin = product.minPurchase ?: 1 %}
+    {% set qcMax = product.calculatedMaxPurchase ?: 0 %}
+    {% set qcStep = product.purchaseSteps ?: 1 %}
+
+    {# Guard against an unset config value (Twig's |default treats false as empty, so use explicit null checks). #}
+    {% set qcEnableHints = config('QuantityCalculator.config.enableHints') %}
+    {% if qcEnableHints is null %}{% set qcEnableHints = true %}{% endif %}
+    {% set qcAutoUpdate = config('QuantityCalculator.config.autoUpdateQuantity') %}
+    {% if qcAutoUpdate is null %}{% set qcAutoUpdate = true %}{% endif %}
+    {% set qcUseServer = config('QuantityCalculator.config.useServerCalculation') ?: false %}
+
+    {% set qcPackUnit = product.translated.packUnit ?? '' %}
+    {% set qcPackUnitPlural = product.translated.packUnitPlural ?? qcPackUnit %}
+
+    {# A non-positive factor would make the calculation meaningless, so the widget is skipped. #}
+    {% if qcFactor > 0 %}
+        {% block quantity_calculator_wrapper %}
+            <div class="col-12 quantity-calculator"
+                 data-quantity-calculator="true"
+                 data-quantity-calculator-options="{{ {
+                     productId: product.id,
+                     factor: qcFactor,
+                     mode: qcMode,
+                     min: qcMin,
+                     max: qcMax,
+                     step: qcStep,
+                     inputUnit: qcInputUnit,
+                     packUnit: qcPackUnit,
+                     packUnitPlural: qcPackUnitPlural,
+                     autoUpdate: qcAutoUpdate,
+                     useServerCalculation: qcUseServer,
+                     calculateUrl: path('frontend.quantity-calculator.calculate'),
+                     txtResultLabel: 'quantityCalculator.resultLabel'|trans|striptags,
+                     txtCalculating: 'quantityCalculator.calculating'|trans|striptags,
+                     txtAdjustedMin: 'quantityCalculator.adjustedMin'|trans|striptags,
+                     txtAdjustedMax: 'quantityCalculator.adjustedMax'|trans|striptags,
+                     txtAdjustedStep: 'quantityCalculator.adjustedStep'|trans|striptags
+                 }|json_encode|e('html_attr') }}">
+
+                {% block quantity_calculator_title %}
+                    <div class="quantity-calculator-title">
+                        {{ 'quantityCalculator.title'|trans|sw_sanitize }}
+                    </div>
+                {% endblock %}
+
+                {% block quantity_calculator_help_text %}
+                    {% if qcHelpText is not empty %}
+                        <p class="quantity-calculator-help text-muted">
+                            {{ qcHelpText|sw_sanitize }}
+                        </p>
+                    {% endif %}
+                {% endblock %}
+
+                {% block quantity_calculator_input_group %}
+                    <label class="form-label quantity-calculator-label" for="qc-need-{{ product.id }}">
+                        {{ 'quantityCalculator.inputLabel'|trans|sw_sanitize }}
+                    </label>
+
+                    <div class="input-group quantity-calculator-input-group">
+                        <input type="number"
+                               id="qc-need-{{ product.id }}"
+                               class="form-control js-qc-need-input"
+                               min="0"
+                               step="any"
+                               inputmode="decimal"
+                               autocomplete="off"
+                               placeholder="{{ 'quantityCalculator.placeholder'|trans|striptags }}"
+                               aria-describedby="qc-result-{{ product.id }}">
+                        {% if qcInputUnit is not empty %}
+                            <span class="input-group-text">{{ qcInputUnit }}</span>
+                        {% endif %}
+                    </div>
+                {% endblock %}
+
+                {% block quantity_calculator_result %}
+                    <div id="qc-result-{{ product.id }}"
+                         class="quantity-calculator-result"
+                         data-qc-result
+                         aria-live="polite"
+                         aria-atomic="true"></div>
+                {% endblock %}
+
+                {% block quantity_calculator_notice %}
+                    <div class="quantity-calculator-notice text-muted" data-qc-notice aria-live="polite"></div>
+                {% endblock %}
+
+                {% block quantity_calculator_hints %}
+                    {% if qcEnableHints and (qcMin > 1 or qcStep > 1 or qcMax > 0) %}
+                        <ul class="quantity-calculator-hints list-unstyled text-muted">
+                            {% if qcMin > 1 %}
+                                <li class="quantity-calculator-hint quantity-calculator-hint-min">
+                                    {{ 'quantityCalculator.minHint'|trans({
+                                        '%min%': qcMin,
+                                        '%unit%': (qcMin > 1 ? qcPackUnitPlural : qcPackUnit)
+                                    })|sw_sanitize }}
+                                </li>
+                            {% endif %}
+                            {% if qcStep > 1 %}
+                                <li class="quantity-calculator-hint quantity-calculator-hint-step">
+                                    {{ 'quantityCalculator.stepHint'|trans({
+                                        '%step%': qcStep,
+                                        '%unit%': qcPackUnitPlural
+                                    })|sw_sanitize }}
+                                </li>
+                            {% endif %}
+                            {% if qcMax > 0 %}
+                                <li class="quantity-calculator-hint quantity-calculator-hint-max">
+                                    {{ 'quantityCalculator.maxHint'|trans({
+                                        '%max%': qcMax,
+                                        '%unit%': qcPackUnitPlural
+                                    })|sw_sanitize }}
+                                </li>
+                            {% endif %}
+                        </ul>
+                    {% endif %}
+                {% endblock %}
+
+                {% block quantity_calculator_payload %}
+                    {# Carried into the line item payload -> visible in cart, checkout and order. #}
+                    <input type="hidden"
+                           name="lineItems[{{ product.id }}][payload][quantityCalcNeed]"
+                           class="js-qc-need-payload"
+                           value="">
+                    <input type="hidden"
+                           name="lineItems[{{ product.id }}][payload][quantityCalcUnit]"
+                           class="js-qc-unit-payload"
+                           value="{{ qcInputUnit }}">
+                    <input type="hidden"
+                           name="lineItems[{{ product.id }}][payload][quantityCalcMode]"
+                           value="{{ qcMode }}">
+                {% endblock %}
+            </div>
+        {% endblock %}
+    {% endif %}
+{% endblock %}

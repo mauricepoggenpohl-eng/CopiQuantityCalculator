@@ -1,0 +1,22 @@
+{% sw_extends '@Storefront/storefront/component/line-item/element/label.html.twig' %}
+
+{#
+    Show the customer's entered need below the product label in cart, off-canvas
+    cart, checkout confirm and the order detail. The value is read from the line
+    item payload that was set on the product detail page and persists through cart
+    recalculation and into the order.
+#}
+{% block component_line_item_label %}
+    {{ parent() }}
+
+    {% if lineItem.payload.quantityCalcNeed is defined and lineItem.payload.quantityCalcNeed is not empty %}
+        {% block component_line_item_label_quantity_calculator %}
+            <div class="line-item-quantity-calculator text-muted">
+                {{ 'quantityCalculator.cartNote'|trans({
+                    '%need%': lineItem.payload.quantityCalcNeed,
+                    '%unit%': lineItem.payload.quantityCalcUnit|default('')
+                })|sw_sanitize }}
+            </div>
+        {% endblock %}
+    {% endif %}
+{% endblock %}

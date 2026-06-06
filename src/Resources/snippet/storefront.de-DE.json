@@ -1,0 +1,16 @@
+{
+    "quantityCalculator": {
+        "title": "Benötigte Menge berechnen",
+        "inputLabel": "Ihr Bedarf",
+        "placeholder": "z. B. 30",
+        "resultLabel": "Benötigte Bestellmenge",
+        "calculating": "Menge wird berechnet …",
+        "minHint": "Mindestabnahme: %min% %unit%",
+        "stepHint": "Abnahme in Schritten von %step% %unit%",
+        "maxHint": "Maximalabnahme: %max% %unit%",
+        "adjustedMin": "Die Menge wurde auf die Mindestabnahme angehoben.",
+        "adjustedMax": "Die Menge wurde auf die Maximalabnahme begrenzt.",
+        "adjustedStep": "Die Menge wurde auf die nächste verfügbare Staffelung aufgerundet.",
+        "cartNote": "Berechnet für %need% %unit%"
+    }
+}

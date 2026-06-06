@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/shopware/shopware/trunk/src/Core/System/SystemConfig/Schema/config.xsd">
+
+    <card>
+        <title>Display</title>
+        <title lang="de-DE">Darstellung</title>
+
+        <input-field type="bool">
+            <name>autoUpdateQuantity</name>
+            <label>Update the order quantity automatically while typing</label>
+            <label lang="de-DE">Bestellmenge automatisch während der Eingabe aktualisieren</label>
+            <helpText>When enabled, the quantity is recalculated live as the customer types. When disabled, it is recalculated when the input loses focus.</helpText>
+            <helpText lang="de-DE">Ist die Option aktiv, wird die Menge live während der Eingabe berechnet. Andernfalls erst, wenn das Feld den Fokus verliert.</helpText>
+            <defaultValue>true</defaultValue>
+        </input-field>
+
+        <input-field type="bool">
+            <name>enableHints</name>
+            <label>Show minimum / step / maximum purchase hints</label>
+            <label lang="de-DE">Hinweise zu Mindest-, Staffel- und Maximalabnahme anzeigen</label>
+            <defaultValue>true</defaultValue>
+        </input-field>
+
+        <input-field type="bool">
+            <name>useServerCalculation</name>
+            <label>Use server-side calculation (Store API) instead of in-browser</label>
+            <label lang="de-DE">Serverseitige Berechnung (Store API) statt im Browser verwenden</label>
+            <helpText>When enabled, the storefront requests the authoritative calculation from the server (the same logic exposed via the Store API). Falls back to the in-browser calculation if the request fails.</helpText>
+            <helpText lang="de-DE">Wenn aktiv, holt der Storefront die maßgebliche Berechnung vom Server (dieselbe Logik wie in der Store API). Bei einem Fehler wird auf die Browser-Berechnung zurückgegriffen.</helpText>
+            <defaultValue>false</defaultValue>
+        </input-field>
+
+        <input-field type="text">
+            <name>defaultInputUnit</name>
+            <label>Fallback input unit label (used when a product has none)</label>
+            <label lang="de-DE">Standard-Einheit der Eingabe (falls beim Produkt nicht gesetzt)</label>
+            <defaultValue>m²</defaultValue>
+        </input-field>
+    </card>
+</config>

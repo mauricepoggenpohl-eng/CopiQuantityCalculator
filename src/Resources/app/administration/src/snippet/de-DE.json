@@ -1,0 +1,28 @@
+{
+    "copi-quantity-calculator": {
+        "general": {
+            "title": "Mengenrechner",
+            "description": "Konfiguration des Mengenrechners je Produkt"
+        },
+        "detail": {
+            "tabTitle": "Mengenrechner",
+            "cardTitle": "Mengenrechner",
+            "intro": "Berechnet die benötigte Bestellmenge aus dem Bedarf des Kunden (Fläche, Länge oder Verbrauch) direkt auf der Produktdetailseite. Mindest-, Staffel- und Maximalabnahme werden aus den nativen Kauf­einstellungen des Produkts übernommen.",
+            "enabledLabel": "Mengenrechner aktivieren",
+            "enabledHelp": "Blendet den Rechner für dieses Produkt im Storefront ein.",
+            "modeLabel": "Berechnungsart",
+            "modeHelp": "Beeinflusst nur die angezeigten Beschriftungen.",
+            "modeArea": "Fläche (z. B. m²)",
+            "modeLength": "Länge (z. B. m)",
+            "modeConsumption": "Verbrauch",
+            "factorLabel": "Bedarf je Verkaufseinheit",
+            "factorHelp": "Wie viel des Kundenbedarfs eine Verkaufseinheit abdeckt. Beispiel: ein Paket Bodenbelag deckt 2,5 m² ab → 2,5 eintragen. Benötigte Menge = aufgerundet(Bedarf / dieser Wert).",
+            "factorWarning": "Ohne einen Wert größer als 0 wird der Rechner im Storefront nicht angezeigt.",
+            "inputUnitLabel": "Einheit der Eingabe",
+            "inputUnitPlaceholder": "z. B. m², m, l",
+            "inputUnitHelp": "Wird neben dem Eingabefeld angezeigt. Leer lassen, um die Standard-Einheit aus den Plugin-Einstellungen zu verwenden.",
+            "helpTextLabel": "Hilfetext für den Kunden",
+            "helpTextHelp": "Optionaler Satz, der über dem Eingabefeld angezeigt wird."
+        }
+    }
+}

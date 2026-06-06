@@ -1,0 +1,28 @@
+{
+    "copi-quantity-calculator": {
+        "general": {
+            "title": "Quantity calculator",
+            "description": "Per-product configuration for the quantity calculator"
+        },
+        "detail": {
+            "tabTitle": "Quantity calculator",
+            "cardTitle": "Quantity calculator",
+            "intro": "Turns a customer's need (area, length or consumption) into the required order quantity right on the product detail page. The minimum, step and maximum come from the product's native purchase settings.",
+            "enabledLabel": "Enable quantity calculator",
+            "enabledHelp": "Shows the calculator for this product in the storefront.",
+            "modeLabel": "Calculation type",
+            "modeHelp": "Affects the displayed labels only.",
+            "modeArea": "Area (e.g. m²)",
+            "modeLength": "Length (e.g. m)",
+            "modeConsumption": "Consumption",
+            "factorLabel": "Coverage per sales unit",
+            "factorHelp": "How much of the customer input one sales unit covers. Example: one box of flooring covers 2.5 m² → enter 2.5. Required quantity = ceil(need / this value).",
+            "factorWarning": "Without a value greater than 0 the calculator is not shown in the storefront.",
+            "inputUnitLabel": "Input unit label",
+            "inputUnitPlaceholder": "e.g. m², m, L",
+            "inputUnitHelp": "Shown next to the input. Leave empty to use the fallback unit from the plugin settings.",
+            "helpTextLabel": "Help text shown to the customer",
+            "helpTextHelp": "Optional sentence shown above the input field."
+        }
+    }
+}

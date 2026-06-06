@@ -1,0 +1,6 @@
+{
+    "name": "quantity-calculator-storefront",
+    "version": "1.0.0",
+    "private": true,
+    "description": "Storefront sources for the Quantity Calculator plugin, compiled by the Shopware storefront webpack build."
+}

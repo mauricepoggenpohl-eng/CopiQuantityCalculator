@@ -1,0 +1,11 @@
+{% block sw_product_detail_content_tabs_additional %}
+    {{ parent() }}
+
+    <sw-tabs-item
+        class="sw-product-detail__tab-quantity-calculator"
+        :route="{ name: 'sw.product.detail.quantityCalculator', params: { id: $route.params.id } }"
+        :title="$t('copi-quantity-calculator.detail.tabTitle')"
+    >
+        {{ $t('copi-quantity-calculator.detail.tabTitle') }}
+    </sw-tabs-item>
+{% endblock %}

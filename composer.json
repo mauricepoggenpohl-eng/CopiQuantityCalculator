@@ -1,0 +1,31 @@
+{
+    "name": "copi/quantity-calculator",
+    "description": "Automatic quantity calculation on the product detail page (area / length / consumption). Calculates the required order quantity from customer input and carries it seamlessly into cart and checkout.",
+    "version": "1.0.0",
+    "type": "shopware-platform-plugin",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Copi"
+        }
+    ],
+    "require": {
+        "../../../vendor/shopware/core": "~6.7.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Copi\\QuantityCalculator\\": "src/"
+        }
+    },
+    "extra": {
+        "shopware-plugin-class": "Copi\\QuantityCalculator\\QuantityCalculator",
+        "label": {
+            "en-GB": "Quantity Calculator",
+            "de-DE": "Mengenrechner"
+        },
+        "description": {
+            "en-GB": "Lets customers enter their need (area, length or consumption) on the product page. The required order quantity is calculated automatically, respects min/step/max purchase rules, and is carried into cart and checkout.",
+            "de-DE": "Kunden geben ihren Bedarf (Fläche, Länge oder Verbrauch) auf der Produktseite ein. Die benötigte Bestellmenge wird automatisch berechnet, berücksichtigt Mindest-/Staffel-/Maximalabnahme und wird in Warenkorb und Checkout übernommen."
+        }
+    }
+}

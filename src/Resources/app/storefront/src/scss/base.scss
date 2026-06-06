@@ -1,0 +1,63 @@
+/*
+ * Quantity calculator widget styles.
+ * Auto-loaded by the storefront theme build (`Resources/app/storefront/src/scss/base.scss`).
+ * Uses the active theme's Bootstrap variables so it inherits the shop's look.
+ */
+
+.quantity-calculator {
+    margin-bottom: $spacer;
+    padding: $spacer;
+    border: 1px solid $border-color;
+    border-radius: $border-radius;
+    background-color: var(--bs-tertiary-bg, $gray-100);
+
+    .quantity-calculator-title {
+        font-weight: $font-weight-bold;
+        margin-bottom: $spacer * 0.25;
+    }
+
+    .quantity-calculator-help {
+        font-size: $font-size-sm;
+        margin-bottom: $spacer * 0.5;
+    }
+
+    .quantity-calculator-label {
+        margin-bottom: $spacer * 0.25;
+    }
+
+    .quantity-calculator-input-group {
+        max-width: 16rem;
+    }
+
+    .quantity-calculator-result {
+        margin-top: $spacer * 0.5;
+        font-weight: $font-weight-bold;
+        min-height: $spacer; // reserve space so the layout does not jump
+    }
+
+    .quantity-calculator-notice {
+        font-size: $font-size-sm;
+    }
+
+    .quantity-calculator-notice:empty {
+        display: none;
+    }
+
+    .quantity-calculator-hints {
+        margin-top: $spacer * 0.5;
+        margin-bottom: 0;
+        font-size: $font-size-sm;
+
+        .quantity-calculator-hint {
+            & + .quantity-calculator-hint {
+                margin-top: $spacer * 0.125;
+            }
+        }
+    }
+}
+
+// Small annotation under the product label in cart / checkout / order views.
+.line-item-quantity-calculator {
+    font-size: $font-size-sm;
+    margin-top: $spacer * 0.25;
+}

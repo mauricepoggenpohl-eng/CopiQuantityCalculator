@@ -1,0 +1,16 @@
+{
+    "quantityCalculator": {
+        "title": "Calculate the required quantity",
+        "inputLabel": "Your demand",
+        "placeholder": "e.g. 30",
+        "resultLabel": "Required order quantity",
+        "calculating": "Calculating quantity …",
+        "minHint": "Minimum order quantity: %min% %unit%",
+        "stepHint": "Sold in steps of %step% %unit%",
+        "maxHint": "Maximum order quantity: %max% %unit%",
+        "adjustedMin": "The quantity was raised to the minimum order quantity.",
+        "adjustedMax": "The quantity was capped at the maximum order quantity.",
+        "adjustedStep": "The quantity was rounded up to the next available step.",
+        "cartNote": "Calculated for %need% %unit%"
+    }
+}

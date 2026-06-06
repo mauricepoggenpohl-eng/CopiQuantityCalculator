@@ -1,0 +1,19 @@
+{% sw_extends '@Storefront/storefront/component/buy-widget/buy-widget-form.html.twig' %}
+
+{#
+    Inject the quantity calculator as a full-width row directly above the native
+    quantity selector. This block is rendered inside the buy <form>, so the hidden
+    payload inputs in the widget are submitted together with the line item and the
+    entered need is carried into cart and checkout.
+#}
+{% block buy_widget_buy_quantity_container %}
+    {% set qcCustomFields = product.translated.customFields ?? product.customFields ?? {} %}
+
+    {% if qcCustomFields['quantity_calculator_enabled'] and product.calculatedMaxPurchase > 0 %}
+        {% sw_include '@QuantityCalculator/storefront/component/quantity-calculator/quantity-calculator.html.twig' with {
+            qcCustomFields: qcCustomFields
+        } %}
+    {% endif %}
+
+    {{ parent() }}
+{% endblock %}
