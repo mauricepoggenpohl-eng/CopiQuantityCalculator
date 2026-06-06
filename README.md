@@ -182,16 +182,7 @@ so the context of the calculated quantity stays visible end to end.
 
 ---
 
-## Testing
-
-The calculation is covered on both sides (the two suites assert the same cases):
-
-```bash
-node --test tests/js/calculation.test.mjs   # storefront JS (no dependencies)
-vendor/bin/phpunit                            # server-side service (run inside Shopware)
-```
-
-**Manual storefront test plan**
+## Manual test plan
 
 1. Configure a product (enable, type *Area*, coverage `2.5`, unit `m²`,
    min `1`, step `1`).
@@ -230,9 +221,6 @@ QuantityCalculator/
 │           └── storefront/
 │               ├── src/                       # ES module sources (main.js, plugin, calc)
 │               └── dist/storefront/js/...     # pre-built artifact (no build needed)
-└── tests/
-    ├── QuantityCalculatorServiceTest.php      # PHPUnit (server-side)
-    └── js/calculation.test.mjs                # Node test (storefront JS)
 ```
 
 ## License
