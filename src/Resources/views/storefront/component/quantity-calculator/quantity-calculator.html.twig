@@ -19,6 +19,7 @@
     {% set qcAutoUpdate = config('QuantityCalculator.config.autoUpdateQuantity') %}
     {% if qcAutoUpdate is null %}{% set qcAutoUpdate = true %}{% endif %}
     {% set qcUseServer = config('QuantityCalculator.config.useServerCalculation') ?: false %}
+    {% set qcVoiceInput = config('QuantityCalculator.config.enableVoiceInput') ?: false %}
 
     {% set qcPackUnit = product.translated.packUnit ?? '' %}
     {% set qcPackUnitPlural = product.translated.packUnitPlural ?? qcPackUnit %}
@@ -41,11 +42,18 @@
                      autoUpdate: qcAutoUpdate,
                      useServerCalculation: qcUseServer,
                      calculateUrl: path('frontend.quantity-calculator.calculate'),
+                     voiceInput: qcVoiceInput,
+                     voiceLang: context.languageInfo.localeCode ?? '',
                      txtResultLabel: 'quantityCalculator.resultLabel'|trans|striptags,
                      txtCalculating: 'quantityCalculator.calculating'|trans|striptags,
                      txtAdjustedMin: 'quantityCalculator.adjustedMin'|trans|striptags,
                      txtAdjustedMax: 'quantityCalculator.adjustedMax'|trans|striptags,
-                     txtAdjustedStep: 'quantityCalculator.adjustedStep'|trans|striptags
+                     txtAdjustedStep: 'quantityCalculator.adjustedStep'|trans|striptags,
+                     txtVoiceStart: 'quantityCalculator.voiceStart'|trans|striptags,
+                     txtVoiceStop: 'quantityCalculator.voiceStop'|trans|striptags,
+                     txtVoiceListening: 'quantityCalculator.voiceListening'|trans|striptags,
+                     txtVoiceNoNumber: 'quantityCalculator.voiceNoNumber'|trans|striptags,
+                     txtVoiceError: 'quantityCalculator.voiceError'|trans|striptags
                  }|json_encode|e('html_attr') }}">
 
                 {% block quantity_calculator_title %}
@@ -80,7 +88,31 @@
                         {% if qcInputUnit is not empty %}
                             <span class="input-group-text">{{ qcInputUnit }}</span>
                         {% endif %}
+                        {% block quantity_calculator_voice_button %}
+                            {% if qcVoiceInput %}
+                                {# Revealed by the JS plugin only if the browser supports speech recognition. #}
+                                <button type="button"
+                                        class="btn btn-outline-secondary quantity-calculator-voice"
+                                        data-qc-voice
+                                        aria-pressed="false"
+                                        aria-label="{{ 'quantityCalculator.voiceStart'|trans|striptags }}"
+                                        title="{{ 'quantityCalculator.voiceStart'|trans|striptags }}"
+                                        hidden>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                         stroke-linejoin="round" aria-hidden="true" focusable="false">
+                                        <rect x="9" y="2" width="6" height="12" rx="3"></rect>
+                                        <path d="M5 10a7 7 0 0 0 14 0"></path>
+                                        <line x1="12" y1="17" x2="12" y2="22"></line>
+                                    </svg>
+                                </button>
+                            {% endif %}
+                        {% endblock %}
                     </div>
+
+                    {% if qcVoiceInput %}
+                        <div class="quantity-calculator-voice-status text-muted" data-qc-voice-status aria-live="polite"></div>
+                    {% endif %}
                 {% endblock %}
 
                 {% block quantity_calculator_result %}

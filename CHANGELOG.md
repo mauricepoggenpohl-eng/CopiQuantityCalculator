@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.0
+
+- Optional voice input for the demand (microphone button, Web Speech API). Parses digits and German/English number words ("30 Quadratmeter", "zwölf komma fünf", "twenty five"). Off by default; enable via *Offer voice input for the demand* in the plugin settings.
+
 ## 1.0.0
 
 - Initial release.

@@ -23,6 +23,8 @@ this regularly causes wrong orders. This plugin does the maths for them.
 - Writes the result into the native quantity field, so it flows **seamlessly
   into cart and checkout** (and the order).
 - Shows **minimum**, **step** and **maximum** purchase hints at the input.
+- Optional **voice input**: customers can dictate their need via a microphone
+  button (Web Speech API, German and English number parsing).
 - Per-product configuration via custom fields; global display options via the
   plugin settings. Optional help text guides the customer.
 
@@ -110,7 +112,25 @@ The **minimum / step / maximum** values come from the product's native
 
 - **Update the order quantity automatically while typing** (default: on)
 - **Show minimum / step / maximum purchase hints** (default: on)
+- **Offer voice input for the demand** (default: off) — see below
 - **Fallback input unit label** (default: `m²`)
+
+### Voice input
+
+When enabled, a microphone button appears next to the demand input. A click
+starts the browser's speech recognition (Web Speech API, language of the current
+sales channel); the spoken value is written into the input and the quantity is
+recalculated immediately.
+
+- Understands digits and number words in German and English, e.g.
+  `30 Quadratmeter`, `12,5 m`, `zwölf komma fünf`, `dreiundzwanzig`,
+  `zweieinhalb`, `twenty five point five`.
+- The button is only shown in browsers that support speech recognition
+  (Chrome, Edge, Safari); elsewhere the widget behaves as before.
+- If no number is recognised, the transcript is shown with a retry hint.
+- **Privacy:** some browsers (e.g. Chrome) send the audio to the browser
+  vendor's speech service. Mention this in your privacy policy before enabling.
+- The microphone requires HTTPS (or `localhost`).
 
 ---
 
@@ -191,6 +211,9 @@ so the context of the calculated quantity stays visible end to end.
 3. Add to cart → cart line shows "Calculated for 30 m²" and quantity `12`.
 4. Proceed to checkout/confirm → the note and quantity are still present.
 5. Set min `5` / step `5`, enter `12` → quantity becomes `15` with a step notice.
+6. Enable voice input in the plugin settings, open the product page in Chrome →
+   click the microphone, say "dreißig Quadratmeter" → input becomes `30`,
+   quantity `12`.
 
 ---
 
@@ -219,7 +242,7 @@ QuantityCalculator/
 │           │   ├── module/sw-product/...      # page override (tab item) + tab view
 │           │   └── snippet/                    # de-DE / en-GB admin snippets
 │           └── storefront/
-│               ├── src/                       # ES module sources (main.js, plugin, calc)
+│               ├── src/                       # ES module sources (main.js, plugin, calc, speech parser)
 │               └── dist/storefront/js/...     # pre-built artifact (no build needed)
 ```
 

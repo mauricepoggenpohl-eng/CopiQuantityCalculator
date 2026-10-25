@@ -11,6 +11,11 @@
         "adjustedMin": "Die Menge wurde auf die Mindestabnahme angehoben.",
         "adjustedMax": "Die Menge wurde auf die Maximalabnahme begrenzt.",
         "adjustedStep": "Die Menge wurde auf die nächste verfügbare Staffelung aufgerundet.",
+        "voiceStart": "Bedarf per Sprache eingeben",
+        "voiceStop": "Spracheingabe beenden",
+        "voiceListening": "Ich höre zu … sagen Sie z. B. „30 Quadratmeter“.",
+        "voiceNoNumber": "Keine Zahl erkannt („%transcript%“). Bitte erneut versuchen.",
+        "voiceError": "Spracheingabe nicht möglich. Bitte Mikrofonzugriff erlauben oder den Wert eintippen.",
         "cartNote": "Berechnet für %need% %unit%"
     }
 }
