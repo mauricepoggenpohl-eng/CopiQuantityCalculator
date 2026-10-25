@@ -29,6 +29,33 @@
         max-width: 16rem;
     }
 
+    .quantity-calculator-voice {
+        display: inline-flex;
+        align-items: center;
+
+        &.is-listening {
+            color: $white;
+            background-color: $danger;
+            border-color: $danger;
+            animation: quantity-calculator-pulse 1.2s ease-in-out infinite;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            &.is-listening {
+                animation: none;
+            }
+        }
+    }
+
+    .quantity-calculator-voice-status {
+        font-size: $font-size-sm;
+        margin-top: $spacer * 0.25;
+    }
+
+    .quantity-calculator-voice-status:empty {
+        display: none;
+    }
+
     .quantity-calculator-result {
         margin-top: $spacer * 0.5;
         font-weight: $font-weight-bold;
@@ -54,6 +81,11 @@
             }
         }
     }
+}
+
+@keyframes quantity-calculator-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
 }
 
 // Small annotation under the product label in cart / checkout / order views.

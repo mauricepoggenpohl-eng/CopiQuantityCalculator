@@ -1,5 +1,6 @@
 import Plugin from 'src/plugin-system/plugin.class';
 import { calculateRequiredQuantity } from './quantity-calculator.calculation.mjs';
+import { parseSpokenNumber } from './quantity-calculator.speech.mjs';
 
 /**
  * Quantity calculator storefront plugin.
@@ -8,6 +9,10 @@ import { calculateRequiredQuantity } from './quantity-calculator.calculation.mjs
  * quantity selector). It reads the customer's need, calculates the required order
  * quantity, writes it into the native quantity input, and mirrors the entered need
  * into the hidden payload inputs so it is carried into cart and checkout.
+ *
+ * Optionally the need can be dictated (Web Speech API): a microphone button next
+ * to the input is revealed when voice input is enabled and the browser supports
+ * speech recognition.
  */
 export default class QuantityCalculatorPlugin extends Plugin {
     static options = {
@@ -34,12 +39,21 @@ export default class QuantityCalculatorPlugin extends Plugin {
         calculateUrl: '',
         /** Debounce in ms for the live "input" recalculation. */
         debounce: 200,
+        /** Offer voice input via the browser's speech recognition (if supported). */
+        voiceInput: false,
+        /** BCP 47 language for speech recognition, e.g. "de-DE". */
+        voiceLang: '',
         /** Translated strings. */
         txtResultLabel: 'Required quantity',
         txtCalculating: '',
         txtAdjustedMin: '',
         txtAdjustedMax: '',
         txtAdjustedStep: '',
+        txtVoiceStart: '',
+        txtVoiceStop: '',
+        txtVoiceListening: '',
+        txtVoiceNoNumber: '',
+        txtVoiceError: '',
     };
 
     init() {
@@ -62,11 +76,113 @@ export default class QuantityCalculatorPlugin extends Plugin {
         }
 
         this._registerEvents();
+        this._initVoiceInput();
     }
 
     _registerEvents() {
         this._needInput.addEventListener('input', this._onInput.bind(this));
         this._needInput.addEventListener('change', this._recalculate.bind(this));
+    }
+
+    _initVoiceInput() {
+        this._voiceButton = this.el.querySelector('[data-qc-voice]');
+        this._voiceStatusEl = this.el.querySelector('[data-qc-voice-status]');
+        this._recognition = null;
+        this._listening = false;
+
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!this.options.voiceInput || !this._voiceButton || !SpeechRecognition) {
+            return;
+        }
+
+        const recognition = new SpeechRecognition();
+        recognition.lang = this.options.voiceLang || document.documentElement.lang || 'de-DE';
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.maxAlternatives = 3;
+
+        recognition.addEventListener('result', this._onVoiceResult.bind(this));
+        recognition.addEventListener('error', this._onVoiceError.bind(this));
+        recognition.addEventListener('end', this._onVoiceEnd.bind(this));
+
+        this._recognition = recognition;
+        this._voiceButton.hidden = false;
+        this._voiceButton.addEventListener('click', this._toggleVoice.bind(this));
+    }
+
+    _toggleVoice() {
+        if (this._listening) {
+            this._recognition.stop();
+            return;
+        }
+
+        try {
+            this._recognition.start();
+        } catch (e) {
+            // start() throws if a recognition session is already running.
+            return;
+        }
+
+        this._setListening(true);
+        this._renderVoiceStatus(this.options.txtVoiceListening);
+    }
+
+    _onVoiceResult(event) {
+        const result = event.results[0];
+        let need = null;
+        let transcript = '';
+
+        // Take the first alternative that contains a usable number.
+        for (let i = 0; i < result.length && need === null; i++) {
+            transcript = result[i].transcript;
+            need = parseSpokenNumber(transcript);
+        }
+
+        if (need === null) {
+            this._renderVoiceStatus(this.options.txtVoiceNoNumber.replace('%transcript%', result[0].transcript));
+            return;
+        }
+
+        this._renderVoiceStatus('');
+        this._needInput.value = String(need);
+        this._recalculate();
+
+        this.$emitter.publish('voiceInput', { transcript, need });
+    }
+
+    _onVoiceError(event) {
+        // "no-speech" and "aborted" are normal user outcomes, not errors worth showing.
+        if (event.error === 'no-speech' || event.error === 'aborted') {
+            this._renderVoiceStatus('');
+            return;
+        }
+
+        this._renderVoiceStatus(this.options.txtVoiceError);
+    }
+
+    _onVoiceEnd() {
+        this._setListening(false);
+        if (this._voiceStatusEl && this._voiceStatusEl.textContent === this.options.txtVoiceListening) {
+            this._renderVoiceStatus('');
+        }
+    }
+
+    _setListening(listening) {
+        this._listening = listening;
+        this._voiceButton.classList.toggle('is-listening', listening);
+        this._voiceButton.setAttribute('aria-pressed', listening ? 'true' : 'false');
+
+        const label = listening ? this.options.txtVoiceStop : this.options.txtVoiceStart;
+        if (label) {
+            this._voiceButton.setAttribute('aria-label', label);
+            this._voiceButton.setAttribute('title', label);
+        }
+    }
+
+    _renderVoiceStatus(message) {
+        if (this._voiceStatusEl) {
+            this._voiceStatusEl.textContent = message;
+        }
     }
 
     _onInput() {

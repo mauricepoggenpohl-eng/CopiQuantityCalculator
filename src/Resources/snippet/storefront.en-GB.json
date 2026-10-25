@@ -11,6 +11,11 @@
         "adjustedMin": "The quantity was raised to the minimum order quantity.",
         "adjustedMax": "The quantity was capped at the maximum order quantity.",
         "adjustedStep": "The quantity was rounded up to the next available step.",
+        "voiceStart": "Enter demand by voice",
+        "voiceStop": "Stop voice input",
+        "voiceListening": "Listening … say e.g. \"30 square metres\".",
+        "voiceNoNumber": "No number recognised (\"%transcript%\"). Please try again.",
+        "voiceError": "Voice input is not available. Please allow microphone access or type the value.",
         "cartNote": "Calculated for %need% %unit%"
     }
 }

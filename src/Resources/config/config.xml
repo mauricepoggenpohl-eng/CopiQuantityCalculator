@@ -31,6 +31,15 @@
             <defaultValue>false</defaultValue>
         </input-field>
 
+        <input-field type="bool">
+            <name>enableVoiceInput</name>
+            <label>Offer voice input for the demand (microphone button)</label>
+            <label lang="de-DE">Spracheingabe für den Bedarf anbieten (Mikrofon-Button)</label>
+            <helpText>Shows a microphone button next to the demand input so customers can dictate the value (e.g. "30 square metres"). Uses the browser's Web Speech API and only appears in browsers that support it. Note: some browsers (e.g. Chrome) process the audio on the vendor's servers — mention this in your privacy policy.</helpText>
+            <helpText lang="de-DE">Zeigt neben dem Bedarfsfeld einen Mikrofon-Button, über den Kunden den Wert diktieren können (z. B. „30 Quadratmeter“). Nutzt die Web Speech API des Browsers und erscheint nur in Browsern, die sie unterstützen. Hinweis: Manche Browser (z. B. Chrome) verarbeiten die Audiodaten auf Servern des Browser-Herstellers — in der Datenschutzerklärung erwähnen.</helpText>
+            <defaultValue>false</defaultValue>
+        </input-field>
+
         <input-field type="text">
             <name>defaultInputUnit</name>
             <label>Fallback input unit label (used when a product has none)</label>
