@@ -13,8 +13,13 @@ raw = subprocess.run(["ffmpeg", "-v", "error", "-i", SRC, "-f", "rawvideo", "-pi
                      capture_output=True, check=True).stdout
 src = np.frombuffer(raw, np.uint8).reshape(-1, H, W, 3)
 NS = len(src)
-def sf(t):  # source frame at time t (s)
+def sf_raw(t):
     return src[min(NS - 1, max(0, int(round(t * FPS))))]
+sys.path.insert(0, __import__('os').path.dirname(__file__) or '.')
+from toon import Toon
+TOON = Toon([src[i] for i in range(0, NS, 30)])
+def sf(t, line=2):  # stylized source frame at time t (s)
+    return TOON(sf_raw(t), line=line)
 
 # ---------- grading ----------
 yy, xx = np.mgrid[0:H, 0:W].astype(np.float32)
@@ -29,7 +34,7 @@ def grade(a):
     f = a.astype(np.float32) / 255
     f = np.clip((f - 0.5) * 1.18 + 0.5, 0, 1)                 # contrast
     l = f.mean(axis=2, keepdims=True)
-    f = np.clip(l + (f - l) * 1.2, 0, 1)                      # saturation
+    f = np.clip(l + (f - l) * 1.05, 0, 1)                      # saturation
     f = f * 255
     f = f * 0.93 + tint * 0.07 * (0.4 + f / 255)               # sunset tint (screen-ish)
     f = f * vig
@@ -167,7 +172,7 @@ def clip(a0, dur, caption=None, cap_from=0.0):
     return (dur, fn)
 
 def card(at, title, line, color):
-    base = painted(sf(at))
+    base = grade(sf(at, line=3))
     def fn(t):
         img = Image.fromarray(base)
         # slow push-in
@@ -194,7 +199,7 @@ scenes.append(clip(8.0, 2.9, "Jede Strähne sitzt.", 0.4))
 scenes.append(clip(10.9, 4.83, "Vorher. Nachher. Keine Fragen.", 1.0))
 
 # mission complete
-last = grade(sf(15.6))
+last = grade(sf(14.3))
 blur = np.array(Image.fromarray(last).filter(ImageFilter.GaussianBlur(14)))
 def s_done(t):
     img = Image.fromarray((blur * 0.8).astype(np.uint8))
