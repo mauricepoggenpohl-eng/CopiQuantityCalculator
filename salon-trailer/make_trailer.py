@@ -16,10 +16,12 @@ NS = len(src)
 def sf_raw(t):
     return src[min(NS - 1, max(0, int(round(t * FPS))))]
 sys.path.insert(0, __import__('os').path.dirname(__file__) or '.')
-from toon import Toon
+from toon import Toon, game_look
 TOON = Toon([src[i] for i in range(0, NS, 30)])
-def sf(t, line=2):  # stylized source frame at time t (s)
+def sf(t, line=2):  # comic artwork frame (freeze cards)
     return TOON(sf_raw(t), line=line)
+def sg(t):  # in-game render look (gameplay clips)
+    return game_look(sf_raw(t))
 
 # ---------- grading ----------
 yy, xx = np.mgrid[0:H, 0:W].astype(np.float32)
@@ -134,7 +136,7 @@ SUBF = F("Inter-Bold.otf", 46)
 
 def sub(img, s):
     d = ImageDraw.Draw(img)
-    d.text((W // 2, H - 230), s, font=SUBF, anchor="mm", fill=(255, 255, 255), stroke_width=3, stroke_fill=(0, 0, 0))
+    d.text((W // 2, H - 430), s, font=SUBF, anchor="mm", fill=(255, 255, 255), stroke_width=3, stroke_fill=(0, 0, 0))
 
 def flash(img, t, dur=0.18):
     if t < dur:
@@ -164,9 +166,51 @@ def s_intro(t):
     return fade_black(letterbox(img), t, 3.0, fin=0.4, fout=0.25)
 scenes.append((3.0, s_intro))
 
-def clip(a0, dur, caption=None, cap_from=0.0):
+HUDF = F("Inter-ExtraBold.otf", 40); HUDS = F("Inter-Bold.otf", 34); CASHF = F("InterDisplay-Black.otf", 64)
+def hud(img, gt, objective, cash):
+    d = ImageDraw.Draw(img, "RGBA")
+    # minimap
+    cx, cy, r = 175, H - 300, 125
+    m = Image.new("RGBA", (2 * r, 2 * r), (0, 0, 0, 0))
+    md = ImageDraw.Draw(m)
+    md.rectangle([0, 0, 2 * r, 2 * r], fill=(70, 85, 95, 255))
+    rot = gt * 6
+    import math as _m
+    for i in range(-4, 5):
+        for ang in (rot, rot + 90):
+            a = _m.radians(ang)
+            ox, oy = _m.cos(a + _m.pi / 2) * i * 55, _m.sin(a + _m.pi / 2) * i * 55
+            dx, dy = _m.cos(a) * 400, _m.sin(a) * 400
+            md.line([(r + ox - dx, r + oy - dy), (r + ox + dx, r + oy + dy)], fill=(150, 160, 165, 255), width=9)
+    a = _m.radians(rot + 90)
+    md.line([(r, r), (r + _m.cos(a) * 90, r + _m.sin(a) * 90)], fill=(255, 80, 170, 255), width=10)
+    px, py = r + _m.cos(a) * 90, r + _m.sin(a) * 90
+    md.ellipse([px - 20, py - 20, px + 20, py + 20], fill=(255, 80, 170, 255), outline=(255, 255, 255, 255), width=3)
+    md.text((px, py), "S", font=F("Inter-Black.otf", 24), anchor="mm", fill=(255, 255, 255, 255))
+    md.polygon([(r, r - 22), (r + 15, r + 16), (r, r + 8), (r - 15, r + 16)], fill=(255, 255, 255, 255))
+    mask = Image.new("L", (2 * r, 2 * r), 0); ImageDraw.Draw(mask).ellipse([0, 0, 2 * r - 1, 2 * r - 1], fill=255)
+    d.ellipse([cx - r - 6, cy - r - 6, cx + r + 6, cy + r + 6], fill=(0, 0, 0, 200))
+    img.paste(m, (cx - r, cy - r), mask)
+    # bars
+    d.rectangle([cx - r, cy + r + 18, cx + r, cy + r + 32], fill=(0, 0, 0, 180))
+    d.rectangle([cx - r + 3, cy + r + 21, cx - r + 3 + int((2 * r - 6) * 0.85), cy + r + 29], fill=(110, 220, 120, 255))
+    d.rectangle([cx - r, cy + r + 38, cx + r, cy + r + 52], fill=(0, 0, 0, 180))
+    d.rectangle([cx - r + 3, cy + r + 41, cx - r + 3 + int((2 * r - 6) * 0.6), cy + r + 49], fill=(90, 170, 255, 255))
+    # cash
+    d.text((W - 50, 330), f"$ {cash:,}".replace(",", "."), font=CASHF, anchor="rm", fill=(120, 230, 140), stroke_width=4, stroke_fill=(0, 0, 0))
+    # objective
+    if objective:
+        tw = d.textlength(objective, font=HUDF)
+        d.rectangle([40, 300, 40 + tw + 50, 430], fill=(0, 0, 0, 170))
+        d.text((65, 330), "ZIEL", font=HUDS, anchor="lm", fill=(255, 120, 190))
+        d.text((65, 385), objective, font=HUDF, anchor="lm", fill=(255, 255, 255))
+
+GT = [0.0]
+def clip(a0, dur, caption=None, cap_from=0.0, objective=None, cash=(1250, 1250)):
     def fn(t):
-        img = letterbox(Image.fromarray(grade(sf(a0 + t))))
+        img = letterbox(Image.fromarray(sg(a0 + t)))
+        c = int(cash[0] + (cash[1] - cash[0]) * ease(t / dur))
+        hud(img, a0 + t, objective, c)
         if caption and t >= cap_from: sub(img, caption)
         return flash(img, t)
     return (dur, fn)
@@ -190,16 +234,16 @@ def card(at, title, line, color):
         return flash(letterbox(img), t, 0.12)
     return (1.6, fn)
 
-scenes.append(clip(0.0, 2.5, "Dunkles Braun. Kein Glanz. Keine Bewegung.", 0.3))
+scenes.append(clip(0.0, 2.5, "Dunkles Braun. Kein Glanz. Keine Bewegung.", 0.3, "Fahre zum Salon.", (1250, 1250)))
 scenes.append(card(1.0, "DIE KUNDIN", "Bereit für Veränderung.", (255, 95, 170)))
-scenes.append(clip(3.0, 2.3, "Ein Plan. Eine Farbe. Kein Zurück.", 0.2))
-scenes.append(clip(5.3, 2.7, None))
+scenes.append(clip(3.0, 2.3, "Ein Plan. Eine Farbe. Kein Zurück.", 0.2, "Setz die Strähnen.", (1250, 1250)))
+scenes.append(clip(5.3, 2.7, None, 0, "Setz die Strähnen.", (1250, 1250)))
 scenes.append(card(7.6, "DAS ERGEBNIS", "Neue Strähnen. Neuer Glanz.", (255, 180, 60)))
-scenes.append(clip(8.0, 2.9, "Jede Strähne sitzt.", 0.4))
-scenes.append(clip(10.9, 4.83, "Vorher. Nachher. Keine Fragen.", 1.0))
+scenes.append(clip(8.0, 2.9, "Jede Strähne sitzt.", 0.4, "Zeig das Ergebnis.", (1250, 5250)))
+scenes.append(clip(10.9, 4.83, "Vorher. Nachher. Keine Fragen.", 1.0, "Vergleiche Vorher / Nachher.", (5250, 9999)))
 
 # mission complete
-last = grade(sf(14.3))
+last = sg(14.3)
 blur = np.array(Image.fromarray(last).filter(ImageFilter.GaussianBlur(14)))
 def s_done(t):
     img = Image.fromarray((blur * 0.8).astype(np.uint8))

@@ -50,3 +50,25 @@ class Toon:
         ink = np.array([20, 8, 28], np.float32)
         out = out.astype(np.float32) * (1 - e * 0.9) + ink * e * 0.9
         return np.clip(out, 0, 255).astype(np.uint8)
+
+
+def game_look(frame):
+    """Real-time-render look: smooth 'shader' surfaces, crisp detail, bloom, slight CA."""
+    h, w = frame.shape[:2]
+    s = cv2.resize(frame, (w // 2, h // 2), interpolation=cv2.INTER_AREA)
+    for _ in range(3):
+        s = cv2.bilateralFilter(s, 9, 28, 9)
+    s = cv2.resize(s, (w, h), interpolation=cv2.INTER_CUBIC)
+    blur = cv2.GaussianBlur(s, (0, 0), 3)
+    s = cv2.addWeighted(s, 1.8, blur, -0.8, 0)              # crisp 'texture' sharpening
+    f = s.astype(np.float32)
+    lum = f.mean(2, keepdims=True)
+    hi = np.clip((lum - 170) / 85, 0, 1) * f
+    bloom = cv2.GaussianBlur(hi, (0, 0), 25)
+    f = f + bloom * 0.55
+    f = (f - 128) * 1.08 + 128
+    out = np.clip(f, 0, 255).astype(np.uint8)
+    # tiny chromatic aberration at edges
+    out[..., 0] = np.roll(out[..., 0], 2, axis=1)
+    out[..., 2] = np.roll(out[..., 2], -2, axis=1)
+    return out
